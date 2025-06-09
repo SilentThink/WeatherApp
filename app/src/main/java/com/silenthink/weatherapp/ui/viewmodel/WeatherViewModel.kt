@@ -15,7 +15,7 @@ data class WeatherUiState(
     val currentWeather: WeatherResponse? = null,
     val forecastWeather: WeatherResponse? = null,
     val searchCities: List<City> = emptyList(),
-    val selectedCity: String = "北京", // 默认城市
+    val selectedCity: String = "Beijing", // 默认城市，使用英文名
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val isSearching: Boolean = false
@@ -30,14 +30,51 @@ class WeatherViewModel : ViewModel() {
     // 公开只读状态
     val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
     
+    // 中文城市名到英文城市名/坐标的映射
+    private val cityMapping = mapOf(
+        "北京" to "Beijing",
+        "上海" to "Shanghai", 
+        "广州" to "Guangzhou",
+        "深圳" to "Shenzhen",
+        "杭州" to "Hangzhou",
+        "南京" to "Nanjing",
+        "武汉" to "Wuhan",
+        "成都" to "Chengdu",
+        "西安" to "Xian",
+        "重庆" to "Chongqing",
+        "天津" to "Tianjin",
+        "青岛" to "Qingdao",
+        "大连" to "Dalian",
+        "厦门" to "Xiamen",
+        "苏州" to "Suzhou",
+        "无锡" to "Wuxi",
+        "宁波" to "Ningbo",
+        "长沙" to "Changsha",
+        "郑州" to "Zhengzhou",
+        "济南" to "Jinan",
+        "沈阳" to "Shenyang",
+        "哈尔滨" to "Harbin",
+        "长春" to "Changchun",
+        "石家庄" to "Shijiazhuang",
+        "长沙" to "Changsha",
+        "郑州" to "Zhengzhou",
+        "济南" to "Jinan",
+    )
+    
     init {
         // 初始化时加载默认城市的天气
         loadWeatherData()
     }
     
+    // 转换城市名称（如果是中文则转换为英文）
+    private fun convertCityName(cityName: String): String {
+        return cityMapping[cityName] ?: cityName
+    }
+    
     // 加载天气数据
     fun loadWeatherData(city: String = _uiState.value.selectedCity) {
         viewModelScope.launch {
+            val convertedCity = convertCityName(city)
             _uiState.value = _uiState.value.copy(
                 isLoading = true,
                 errorMessage = null,
@@ -47,7 +84,7 @@ class WeatherViewModel : ViewModel() {
             try {
                 // 同时获取当前天气和预报天气
                 launch {
-                    repository.getCurrentWeather(city).collect { result ->
+                    repository.getCurrentWeather(convertedCity).collect { result ->
                         result.fold(
                             onSuccess = { weather ->
                                 _uiState.value = _uiState.value.copy(
@@ -66,7 +103,7 @@ class WeatherViewModel : ViewModel() {
                 }
                 
                 launch {
-                    repository.getForecastWeather(city, 7).collect { result ->
+                    repository.getForecastWeather(convertedCity, 7).collect { result ->
                         result.fold(
                             onSuccess = { forecast ->
                                 _uiState.value = _uiState.value.copy(
@@ -100,7 +137,8 @@ class WeatherViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSearching = true)
             
-            repository.searchCities(query).collect { result ->
+            val convertedQuery = convertCityName(query)
+            repository.searchCities(convertedQuery).collect { result ->
                 result.fold(
                     onSuccess = { cities ->
                         _uiState.value = _uiState.value.copy(
