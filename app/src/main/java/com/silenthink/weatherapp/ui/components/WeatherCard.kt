@@ -201,10 +201,10 @@ fun getWeatherIcon(code: Int, isDay: Boolean): ImageVector {
     return when (code) {
         1000 -> if (isDay) Icons.Default.WbSunny else Icons.Default.NightsStay
         1003, 1006, 1009 -> Icons.Default.Cloud
-        1030, 1135, 1147 -> Icons.Default.Foggy
+        1030, 1135, 1147 -> Icons.Default.Cloud
         1063, 1150, 1153, 1180, 1183, 1186, 1189, 1192, 1195, 1240, 1243, 1246 -> Icons.Default.Grain
         1066, 1069, 1072, 1114, 1117, 1210, 1213, 1216, 1219, 1222, 1225, 1237, 1249, 1252, 1255, 1258, 1261, 1264 -> Icons.Default.AcUnit
-        1087, 1273, 1276, 1279, 1282 -> Icons.Default.Flash
+        1087, 1273, 1276, 1279, 1282 -> Icons.Default.Bolt
         else -> if (isDay) Icons.Default.WbSunny else Icons.Default.NightsStay
     }
 }
