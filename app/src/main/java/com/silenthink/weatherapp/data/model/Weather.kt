@@ -1,5 +1,7 @@
 package com.silenthink.weatherapp.data.model
 
+import com.google.gson.annotations.SerializedName
+
 // 主要天气信息
 data class WeatherResponse(
     @SerializedName("location") val location: Location,
