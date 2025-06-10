@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">WeatherApp</string>
+
+    <!-- Widget相关字符串 -->
+    <string name="weather_widget_description">显示当前天气信息的桌面小组件</string>
+    <string name="widget_loading">加载中...</string>
+    <string name="widget_error">获取失败</string>
+    <string name="widget_refresh">刷新</string>
 </resources>

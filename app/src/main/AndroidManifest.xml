@@ -31,6 +31,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- 天气小组件Provider -->
+        <receiver android:name=".widget.WeatherWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.silenthink.weatherapp.WIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/weather_widget_info" />
+        </receiver>
+
+        <!-- 天气小组件更新服务 -->
+        <service android:name=".widget.WeatherWidgetUpdateService"
+            android:exported="false" />
     </application>
 
 </manifest>

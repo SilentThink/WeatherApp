@@ -15,9 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
+import com.silenthink.weatherapp.widget.WeatherWidgetProvider
 import com.silenthink.weatherapp.ui.components.*
 import com.silenthink.weatherapp.ui.theme.WeatherAppTheme
 import com.silenthink.weatherapp.ui.viewmodel.WeatherViewModel
+import androidx.core.content.edit
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,6 +40,7 @@ class MainActivity : ComponentActivity() {
 fun WeatherApp() {
     val viewModel: WeatherViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
     
     var searchQuery by remember { mutableStateOf("") }
     
@@ -79,6 +84,15 @@ fun WeatherApp() {
                 onCitySelected = { city ->
                     viewModel.selectCity(city)
                     searchQuery = ""
+
+                    // 保存选中的城市到widget偏好设置
+                    context.getSharedPreferences("weather_widget", Context.MODE_PRIVATE)
+                        .edit {
+                            putString("selected_city", city)
+                        }
+                        
+                    // 立即更新widget
+                    WeatherWidgetProvider.updateWidgetData(context)
                 },
                 isSearching = uiState.isSearching
             )
