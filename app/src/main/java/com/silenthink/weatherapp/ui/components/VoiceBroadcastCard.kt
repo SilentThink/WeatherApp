@@ -26,6 +26,7 @@ fun VoiceBroadcastCard(
     var isInitialized by remember { mutableStateOf(false) }
     var isPlaying by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
+    var broadcastText by remember { mutableStateOf("") }
     
     // 初始化语音管理器
     LaunchedEffect(Unit) {
@@ -101,7 +102,9 @@ fun VoiceBroadcastCard(
                             weatherResponse?.let { weather ->
                                 scope.launch {
                                     isPlaying = true
-                                    voiceManager?.broadcastWeather(weather)
+                                    broadcastText = "" // 清除之前的文字
+                                    val reportText = voiceManager?.broadcastWeather(weather)
+                                    broadcastText = reportText ?: "播报失败"
                                     // 简单的播放状态管理，实际应该监听TTS回调
                                     kotlinx.coroutines.delay(3000)
                                     isPlaying = false
@@ -124,7 +127,9 @@ fun VoiceBroadcastCard(
                             weatherResponse?.let { weather ->
                                 scope.launch {
                                     isPlaying = true
-                                    voiceManager?.quickBroadcast(weather)
+                                    broadcastText = "" // 清除之前的文字
+                                    val reportText = voiceManager?.quickBroadcast(weather)
+                                    broadcastText = reportText ?: "播报失败"
                                     kotlinx.coroutines.delay(2000)
                                     isPlaying = false
                                 }
@@ -153,9 +158,50 @@ fun VoiceBroadcastCard(
                             onClick = { 
                                 voiceManager?.stopBroadcast()
                                 isPlaying = false
+                                broadcastText = "" // 停止时清除文字
                             }
                         ) {
                             Icon(Icons.Default.Stop, contentDescription = "停止")
+                        }
+                    }
+                }
+                
+                // 显示播报文字
+                if (broadcastText.isNotEmpty()) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surface
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.TextFields,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "播报内容：",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = broadcastText,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
                         }
                     }
                 }

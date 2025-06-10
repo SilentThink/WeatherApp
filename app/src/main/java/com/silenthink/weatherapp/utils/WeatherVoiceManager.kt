@@ -35,7 +35,7 @@ class WeatherVoiceManager(private val context: Context) {
     /**
      * 播报天气信息
      */
-    suspend fun broadcastWeather(weatherResponse: WeatherResponse): Boolean {
+    suspend fun broadcastWeather(weatherResponse: WeatherResponse): String? {
         return withContext(Dispatchers.IO) {
             try {
                 // 提取天气数据
@@ -49,9 +49,11 @@ class WeatherVoiceManager(private val context: Context) {
                 withContext(Dispatchers.Main) {
                     voiceBroadcastService.startSpeaking(reportText)
                 }
+                
+                reportText // 返回生成的文字
             } catch (e: Exception) {
                 Log.e(TAG, "播报天气失败: ${e.message}")
-                false
+                null
             }
         }
     }
@@ -123,7 +125,7 @@ class WeatherVoiceManager(private val context: Context) {
     /**
      * 生成快速播报（使用默认模板）
      */
-    suspend fun quickBroadcast(weatherResponse: WeatherResponse): Boolean {
+    suspend fun quickBroadcast(weatherResponse: WeatherResponse): String? {
         return withContext(Dispatchers.IO) {
             try {
                 val current = weatherResponse.current
@@ -138,9 +140,11 @@ class WeatherVoiceManager(private val context: Context) {
                 withContext(Dispatchers.Main) {
                     voiceBroadcastService.startSpeaking(quickText)
                 }
+                
+                quickText // 返回生成的文字
             } catch (e: Exception) {
                 Log.e(TAG, "快速播报失败: ${e.message}")
-                false
+                null
             }
         }
     }
