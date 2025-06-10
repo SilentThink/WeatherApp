@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.silenthink.weatherapp.data.model.ForecastDay
+import com.silenthink.weatherapp.utils.WeatherTranslator
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -124,7 +125,7 @@ fun DateSelectorItem(
                     forecastDay.day.condition.code,
                     true
                 ),
-                contentDescription = forecastDay.day.condition.text,
+                contentDescription = WeatherTranslator.translateWeatherCondition(forecastDay.day.condition.text),
                 modifier = Modifier.size(24.dp),
                 tint = textColor
             )

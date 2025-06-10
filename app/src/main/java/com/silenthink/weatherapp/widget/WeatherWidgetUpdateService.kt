@@ -8,6 +8,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import com.silenthink.weatherapp.data.repository.WeatherRepository
+import com.silenthink.weatherapp.utils.WeatherTranslator
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.catch
 import java.text.SimpleDateFormat
@@ -93,7 +94,7 @@ class WeatherWidgetUpdateService : Service() {
                         result.onSuccess { weather ->
                             saveWeatherToPrefs(weather.location.name, 
                                              weather.current.tempC.toInt().toString(),
-                                             weather.current.condition.text)
+                                             WeatherTranslator.translateWeatherCondition(weather.current.condition.text))
                             
                             // 更新小组件UI
                             withContext(Dispatchers.Main) {

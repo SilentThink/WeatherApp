@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.silenthink.weatherapp.data.model.ForecastDay
 import com.silenthink.weatherapp.data.model.Hour
+import com.silenthink.weatherapp.utils.WeatherTranslator
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
@@ -87,13 +88,13 @@ fun SelectedDateWeatherCard(
                     // 显示天气图标
                     Icon(
                         imageVector = getWeatherIcon(forecastDay.day.condition.code, true),
-                        contentDescription = forecastDay.day.condition.text,
+                        contentDescription = WeatherTranslator.translateWeatherCondition(forecastDay.day.condition.text),
                         modifier = Modifier.size(48.dp),
                         tint = MaterialTheme.colorScheme.primary
                     )
                     
                     Text(
-                        text = forecastDay.day.condition.text,
+                        text = WeatherTranslator.translateWeatherCondition(forecastDay.day.condition.text),
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center
                     )
@@ -219,7 +220,7 @@ fun HourlyWeatherItem(hour: Hour) {
             // 天气图标
             Icon(
                 imageVector = getWeatherIcon(hour.condition.code, hour.isDay == 1),
-                contentDescription = hour.condition.text,
+                contentDescription = WeatherTranslator.translateWeatherCondition(hour.condition.text),
                 modifier = Modifier.size(24.dp),
                 tint = MaterialTheme.colorScheme.primary
             )

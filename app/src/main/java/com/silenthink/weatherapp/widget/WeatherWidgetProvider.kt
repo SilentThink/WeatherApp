@@ -10,6 +10,7 @@ import android.widget.RemoteViews
 import com.silenthink.weatherapp.MainActivity
 import com.silenthink.weatherapp.R
 import com.silenthink.weatherapp.data.repository.WeatherRepository
+import com.silenthink.weatherapp.utils.WeatherTranslator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -174,7 +175,7 @@ class WeatherWidgetProvider : AppWidgetProvider() {
                                 saveWeatherToPrefs(context, 
                                     weather.location.name, 
                                     weather.current.tempC.toInt().toString(),
-                                    weather.current.condition.text)
+                                    WeatherTranslator.translateWeatherCondition(weather.current.condition.text))
                                 
                                 // 更新小组件UI
                                 updateWidgetData(context)

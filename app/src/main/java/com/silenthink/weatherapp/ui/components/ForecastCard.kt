@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.silenthink.weatherapp.data.model.ForecastDay
+import com.silenthink.weatherapp.utils.WeatherTranslator
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
@@ -84,7 +85,7 @@ fun ForecastDayItem(forecastDay: ForecastDay) {
                     forecastDay.day.condition.code,
                     true // 白天图标
                 ),
-                contentDescription = forecastDay.day.condition.text,
+                contentDescription = WeatherTranslator.translateWeatherCondition(forecastDay.day.condition.text),
                 modifier = Modifier.size(32.dp),
                 tint = MaterialTheme.colorScheme.primary
             )

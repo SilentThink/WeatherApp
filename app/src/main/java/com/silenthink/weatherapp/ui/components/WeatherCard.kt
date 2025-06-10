@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.silenthink.weatherapp.data.model.Current
 import com.silenthink.weatherapp.data.model.Location
+import com.silenthink.weatherapp.utils.WeatherTranslator
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,13 +78,13 @@ fun WeatherCard(
                     // 显示天气图标
                     Icon(
                         imageVector = getWeatherIcon(current.condition.code, current.isDay == 1),
-                        contentDescription = current.condition.text,
+                        contentDescription = WeatherTranslator.translateWeatherCondition(current.condition.text),
                         modifier = Modifier.size(48.dp),
                         tint = MaterialTheme.colorScheme.primary
                     )
                     
                     Text(
-                        text = current.condition.text,
+                        text = WeatherTranslator.translateWeatherCondition(current.condition.text),
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center
                     )
@@ -115,7 +116,7 @@ fun WeatherDetailsGrid(current: Current) {
             WeatherDetailItem(
                 icon = Icons.Default.Air,
                 label = "风速",
-                value = "${current.windKph.roundToInt()} km/h"
+                value = "${WeatherTranslator.translateWindDirection(current.windDir)} ${current.windKph.roundToInt()} km/h"
             )
         }
         

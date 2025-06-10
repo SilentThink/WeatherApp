@@ -113,7 +113,7 @@ class WeatherVoiceManager(private val context: Context) {
         return WeatherReportRequest(
             city = location.name,
             temperature = "${current.tempC.toInt()}°C",
-            condition = current.condition.text,
+            condition = WeatherTranslator.translateWeatherCondition(current.condition.text),
             humidity = "${current.humidity}%",
             windSpeed = "${current.windKph}km/h",
             airQuality = null // 如果有空气质量数据可以在这里添加
@@ -129,7 +129,11 @@ class WeatherVoiceManager(private val context: Context) {
                 val current = weatherResponse.current
                 val location = weatherResponse.location
                 
-                val quickText = generateQuickReport(location.name, current.tempC.toInt(), current.condition.text)
+                val quickText = generateQuickReport(
+                    location.name, 
+                    current.tempC.toInt(), 
+                    WeatherTranslator.translateWeatherCondition(current.condition.text)
+                )
                 
                 withContext(Dispatchers.Main) {
                     voiceBroadcastService.startSpeaking(quickText)
