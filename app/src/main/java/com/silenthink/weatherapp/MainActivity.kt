@@ -21,6 +21,9 @@ import com.silenthink.weatherapp.widget.WeatherWidgetProvider
 import com.silenthink.weatherapp.ui.components.*
 import com.silenthink.weatherapp.ui.theme.WeatherAppTheme
 import com.silenthink.weatherapp.ui.viewmodel.WeatherViewModel
+import com.silenthink.weatherapp.ui.viewmodel.WeatherViewModelFactory
+import com.silenthink.weatherapp.utils.rememberLocationPermissionLauncher
+import com.silenthink.weatherapp.utils.LOCATION_PERMISSIONS
 import androidx.core.content.edit
 
 class MainActivity : ComponentActivity() {
@@ -38,11 +41,32 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherApp() {
-    val viewModel: WeatherViewModel = viewModel()
-    val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    val viewModel: WeatherViewModel = viewModel(
+        factory = WeatherViewModelFactory(context)
+    )
+    val uiState by viewModel.uiState.collectAsState()
     
     var searchQuery by remember { mutableStateOf("") }
+    var hasRequestedPermission by remember { mutableStateOf(false) }
+    
+    // 权限请求处理
+    val locationPermissionLauncher = rememberLocationPermissionLauncher { granted ->
+        // 无论是否授权，都更新权限状态
+        viewModel.updateLocationPermissionStatus()
+        
+        if (granted) {
+            // 权限已授权，getCurrentLocationWeather会在updateLocationPermissionStatus中自动调用
+        }
+    }
+    
+    // 应用启动时自动请求位置权限
+    LaunchedEffect(Unit) {
+        if (!uiState.isLocationEnabled && !hasRequestedPermission) {
+            hasRequestedPermission = true
+            locationPermissionLauncher.launch(LOCATION_PERMISSIONS)
+        }
+    }
     
     // 监听搜索查询变化
     LaunchedEffect(searchQuery) {
@@ -76,6 +100,20 @@ fun WeatherApp() {
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // 位置按钮
+            LocationButton(
+                isLocationEnabled = uiState.isLocationEnabled,
+                isLoading = uiState.isLoading,
+                locationCity = uiState.locationCity,
+                onLocationClick = {
+                    if (uiState.isLocationEnabled) {
+                        viewModel.getCurrentLocationWeather()
+                    } else {
+                        locationPermissionLauncher.launch(LOCATION_PERMISSIONS)
+                    }
+                }
+            )
+            
             // 城市搜索栏
             CitySearchBar(
                 searchQuery = searchQuery,

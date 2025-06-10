@@ -5,10 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.silenthink.weatherapp.data.model.WeatherResponse
 import com.silenthink.weatherapp.data.model.City
 import com.silenthink.weatherapp.data.repository.WeatherRepository
+import com.silenthink.weatherapp.data.LocationManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import android.content.Context
 
 // UI 状态数据类
 data class WeatherUiState(
@@ -18,12 +20,15 @@ data class WeatherUiState(
     val selectedCity: String = "Beijing", // 默认城市，使用英文名
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val isSearching: Boolean = false
+    val isSearching: Boolean = false,
+    val isLocationEnabled: Boolean = false,
+    val locationCity: String? = null
 )
 
-class WeatherViewModel : ViewModel() {
+class WeatherViewModel(private val context: Context? = null) : ViewModel() {
     
     private val repository = WeatherRepository()
+    private val locationManager = context?.let { LocationManager(it) }
     
     // 私有可变状态
     private val _uiState = MutableStateFlow(WeatherUiState())
@@ -62,13 +67,69 @@ class WeatherViewModel : ViewModel() {
     )
     
     init {
-        // 初始化时加载默认城市的天气
-        loadWeatherData()
+        // 初始化时检查位置权限
+        checkLocationPermission()
+        
+        // 如果有位置权限，尝试自动获取当前位置
+        if (locationManager?.hasLocationPermission() == true) {
+            getCurrentLocationWeather()
+        } else {
+            // 没有权限时加载默认城市的天气
+            loadWeatherData()
+        }
+    }
+    
+    // 检查位置权限
+    private fun checkLocationPermission() {
+        locationManager?.let { manager ->
+            val hasPermission = manager.hasLocationPermission()
+            _uiState.value = _uiState.value.copy(isLocationEnabled = hasPermission)
+        }
+    }
+    
+    // 更新权限状态（供外部调用）
+    fun updateLocationPermissionStatus() {
+        checkLocationPermission()
+        // 如果获得权限，自动获取当前位置
+        if (_uiState.value.isLocationEnabled && _uiState.value.locationCity == null) {
+            getCurrentLocationWeather()
+        }
     }
     
     // 转换城市名称（如果是中文则转换为英文）
     private fun convertCityName(cityName: String): String {
         return cityMapping[cityName] ?: cityName
+    }
+    
+    // 获取当前位置的城市并设置天气
+    fun getCurrentLocationWeather() {
+        locationManager?.let { manager ->
+            viewModelScope.launch {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = true,
+                    errorMessage = null
+                )
+                
+                manager.getCurrentCity().fold(
+                    onSuccess = { city ->
+                        _uiState.value = _uiState.value.copy(locationCity = city)
+                        // 使用获取到的城市加载天气
+                        loadWeatherData(city)
+                    },
+                    onFailure = { exception ->
+                        _uiState.value = _uiState.value.copy(
+                            errorMessage = "获取位置失败: ${exception.message}",
+                            isLoading = false
+                        )
+                    }
+                )
+            }
+        } ?: run {
+            _uiState.value = _uiState.value.copy(
+                errorMessage = "位置服务不可用",
+                isLoading = false
+            )
+        }
     }
     
     // 加载天气数据
