@@ -22,7 +22,8 @@ data class WeatherUiState(
     val errorMessage: String? = null,
     val isSearching: Boolean = false,
     val isLocationEnabled: Boolean = false,
-    val locationCity: String? = null
+    val locationCity: String? = null,
+    val selectedDateIndex: Int = 0 // 添加选中的日期索引，0表示今天
 )
 
 class WeatherViewModel(private val context: Context? = null) : ViewModel() {
@@ -234,5 +235,10 @@ class WeatherViewModel(private val context: Context? = null) : ViewModel() {
     // 清除错误信息
     fun clearError() {
         _uiState.value = _uiState.value.copy(errorMessage = null)
+    }
+    
+    // 选择日期
+    fun selectDate(dateIndex: Int) {
+        _uiState.value = _uiState.value.copy(selectedDateIndex = dateIndex)
     }
 }

@@ -196,19 +196,32 @@ fun WeatherApp() {
                 )
             }
             
+            // 日期选择器和选中日期的天气详情
+            uiState.forecastWeather?.let { forecast ->
+                if (forecast.forecast.forecastday.isNotEmpty()) {
+                    // 日期选择器
+                    DateSelectorCard(
+                        forecastDays = forecast.forecast.forecastday,
+                        selectedDateIndex = uiState.selectedDateIndex,
+                        onDateSelected = { index ->
+                            viewModel.selectDate(index)
+                        }
+                    )
+                    
+                    // 选中日期的详细天气
+                    if (uiState.selectedDateIndex < forecast.forecast.forecastday.size) {
+                        SelectedDateWeatherCard(
+                            forecastDay = forecast.forecast.forecastday[uiState.selectedDateIndex],
+                            isToday = uiState.selectedDateIndex == 0
+                        )
+                    }
+                }
+            }
+            
             // 语音播报卡片
             VoiceBroadcastCard(
                 weatherResponse = uiState.currentWeather
             )
-            
-            // 天气预报卡片
-            uiState.forecastWeather?.let { forecast ->
-                if (forecast.forecast.forecastday.isNotEmpty()) {
-                    ForecastCard(
-                        forecastDays = forecast.forecast.forecastday
-                    )
-                }
-            }
         }
     }
 }
