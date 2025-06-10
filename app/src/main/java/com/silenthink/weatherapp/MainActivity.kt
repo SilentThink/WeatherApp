@@ -75,6 +75,20 @@ fun WeatherApp() {
         }
     }
     
+    // 监听位置城市变化，自动同步到小组件
+    LaunchedEffect(uiState.locationCity) {
+        uiState.locationCity?.let { city ->
+            // 保存位置城市到widget偏好设置
+            context.getSharedPreferences("weather_widget", Context.MODE_PRIVATE)
+                .edit {
+                    putString("selected_city", city)
+                }
+            
+            // 立即更新widget数据
+            WeatherWidgetProvider.updateWidgetDataForCity(context, city)
+        }
+    }
+    
     Scaffold(
         topBar = {
             TopAppBar(
@@ -129,8 +143,8 @@ fun WeatherApp() {
                             putString("selected_city", city)
                         }
                         
-                    // 立即更新widget
-                    WeatherWidgetProvider.updateWidgetData(context)
+                    // 立即更新widget数据
+                    WeatherWidgetProvider.updateWidgetDataForCity(context, city)
                 },
                 isSearching = uiState.isSearching
             )

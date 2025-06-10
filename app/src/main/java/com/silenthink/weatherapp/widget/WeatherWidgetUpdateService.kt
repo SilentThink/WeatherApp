@@ -24,6 +24,39 @@ class WeatherWidgetUpdateService : Service() {
     private var updateRunnable: Runnable? = null
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
+    // 中文城市名到英文城市名的映射，与ViewModel和WeatherWidgetProvider保持一致
+    private val cityMapping = mapOf(
+        "北京" to "Beijing",
+        "上海" to "Shanghai", 
+        "广州" to "Guangzhou",
+        "深圳" to "Shenzhen",
+        "杭州" to "Hangzhou",
+        "南京" to "Nanjing",
+        "武汉" to "Wuhan",
+        "成都" to "Chengdu",
+        "西安" to "Xian",
+        "重庆" to "Chongqing",
+        "天津" to "Tianjin",
+        "青岛" to "Qingdao",
+        "大连" to "Dalian",
+        "厦门" to "Xiamen",
+        "苏州" to "Suzhou",
+        "无锡" to "Wuxi",
+        "宁波" to "Ningbo",
+        "长沙" to "Changsha",
+        "郑州" to "Zhengzhou",
+        "济南" to "Jinan",
+        "沈阳" to "Shenyang",
+        "哈尔滨" to "Harbin",
+        "长春" to "Changchun",
+        "石家庄" to "Shijiazhuang"
+    )
+
+    // 转换城市名称（如果是中文则转换为英文）
+    private fun convertCityName(cityName: String): String {
+        return cityMapping[cityName] ?: cityName
+    }
+
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -48,7 +81,10 @@ class WeatherWidgetUpdateService : Service() {
                 val prefs = getSharedPreferences("weather_widget", Context.MODE_PRIVATE)
                 val defaultCity = prefs.getString("selected_city", "北京") ?: "北京"
                 
-                repository.getCurrentWeather(defaultCity)
+                // 转换城市名称
+                val convertedCity = convertCityName(defaultCity)
+                
+                repository.getCurrentWeather(convertedCity)
                     .catch { e ->
                         Log.e("WeatherWidget", "获取天气数据失败", e)
                         saveErrorToPrefs("网络错误")
