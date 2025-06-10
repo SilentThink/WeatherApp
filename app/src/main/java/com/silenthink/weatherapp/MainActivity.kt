@@ -196,6 +196,11 @@ fun WeatherApp() {
                 )
             }
             
+            // 语音播报卡片
+            VoiceBroadcastCard(
+                weatherResponse = uiState.currentWeather
+            )
+            
             // 天气预报卡片
             uiState.forecastWeather?.let { forecast ->
                 if (forecast.forecast.forecastday.isNotEmpty()) {

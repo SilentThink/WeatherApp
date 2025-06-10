@@ -76,6 +76,15 @@ dependencies {
     
     // 图标扩展
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
+    
+    // 科大讯飞TTS SDK
+    implementation(files("libs/Msc.jar"))
+    
+    // 协程支持
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    
+    // AI API调用
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
